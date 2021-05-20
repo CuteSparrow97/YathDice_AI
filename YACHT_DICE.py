@@ -5,13 +5,13 @@ import tkinter.ttk
 # 야추 다이스에는 총 2명의 Player가 존재한다.
 # Player가 가지고 있는 정보 : 점수, 주사위 던진 횟수, 먹은 족보 , 턴수
 class Player:
-    def __init__(self,nScore,nChance,dHandRankings,nTurn):
+    def __init__(self,nScore,nChance,nTurn):
         self.nScore = nScore
         self.nChance = nChance
-        self.dHandRankings = dHandRankings
         self.nTurn = nTurn
         self.Player_Dice()
         self.nCounts = 0
+        self.pedigree = pedigree()
 
     # Player는 총 5개의 주사위를 가지고 있다.
     def Player_Dice(self):
@@ -55,6 +55,8 @@ class Player:
             self.Dices[nDice3].Holding(True)
             self.Dices[nDice4].Holding(True)
 
+    # 자신의 족보 가지고 있기
+    # def
 
 # 주사위 만들기
 class Dice:
@@ -70,15 +72,21 @@ class Dice:
     def Holding(self, bHolding):
         self.bHolding = bHolding
 
+# 족보(Player마다 자신의 족보 점수 / 판을 가져야 한다.
+class pedigree:
+    def __init__(self):
+        self.pedigree = {'OneChoice':0, 'TwoChoice' : 0, 'ThreeChoice' : 0, 'FourChoice' : 0, 'FiveChoice' : 0,
+                    'YACHT' : 0}
+
 
 # 초기값  설정
 nScore = 0
 nChance = 3
-dHandRankings = {'1':2,'2':0,'3':0,'4':0,'5':0,'6':0,'all':0}
+#dHandRankings = {'1':2,'2':0,'3':0,'4':0,'5':0,'6':0,'all':0}
 nTurn = 0
 
 # Player1 생성
-Player1 = Player(nScore, nChance, dHandRankings, nTurn)
+Player1 = Player(nScore, nChance, nTurn)
 #Player2 = Player(nScore, nChance, dHandRankings, nTurn)
 
 # 초기값 출력
@@ -113,7 +121,7 @@ treeview.column("#1", width = 100, anchor = "center")
 treeview.heading("one", text="값", anchor = "center")
 
 # 표에 데이터 삽입
-for key, value in dHandRankings.items():
+for key, value in Player1.pedigree.pedigree.items():
     treeview.insert('','end',text = key, values = value,iid=key)
 
 # GUI 실행
