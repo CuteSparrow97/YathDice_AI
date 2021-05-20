@@ -1,6 +1,7 @@
 import random
 import tkinter
 import tkinter.ttk
+import tkinter as tk
 
 # 야추 다이스에는 총 2명의 Player가 존재한다.
 # Player가 가지고 있는 정보 : 점수, 주사위 던진 횟수, 먹은 족보 , 턴수
@@ -100,29 +101,76 @@ Player1.PrintDiceValue()
 # Player1.PrintDiceValue()
 # print(dHandRankings)
 
+######## GUI 구성 ##########
+
+##### 족보 표생성 #####
 # GUI창을 생성하고 라벨을 설정한다.
-root = tkinter.Tk()
+root = tk.Tk()
 root.title("Yatch Dice")
-root.geometry("540x300+100+100")
+root.geometry("900x600")
 root.resizable(False,False)
 
-lbl = tkinter.Label(root, text="Player1")
-lbl.pack()
+Player1_frame = tk.Frame(root, background="#FFF0C1", bd=1, relief="sunken")
+Player2_frame = tk.Frame(root, background="#D2E2FB", bd=1, relief="sunken")
+DiceValue_frame = tk.Frame(root, background="#CCE4CA", bd=1, relief="sunken")
+button_frame = tk.Frame(root, background="#F5C2C1", bd=1, relief="sunken")
+
+Player1_frame.grid(row=0, column=0, sticky="nsew", padx=2, pady=2)
+Player2_frame.grid(row=1, column=0, sticky="nsew", padx=2, pady=2)
+DiceValue_frame.grid(row=0, column=1, rowspan=2, sticky="nsew", padx=2, pady=2)
+button_frame.grid(row=0, column=2, rowspan=2, sticky="nsew", padx=2, pady=2)
+
+root.grid_rowconfigure(0, weight=2)
+root.grid_rowconfigure(1, weight=10)
+
+root.grid_columnconfigure(0, weight=2)
+root.grid_columnconfigure(1, weight=2)
+root.grid_columnconfigure(2, weight=2)
+
+
+lbl = tkinter.Label(Player1_frame, text="Player1")
+lbl.pack(side="top", fill ="x")
 
 # 표 생성하기. coulms는 컬럼 이름, displaycolums는 실행될 때 보여지는 순서이다.
-treeview = tkinter.ttk.Treeview(root, columns=["one"], displaycolumns = ["one"])
-treeview.pack()
+Pedigree_View = tkinter.ttk.Treeview(Player1_frame, columns=["one"], displaycolumns = ["one"])
+Pedigree_View.pack(side="left", fill="both", expand=True)
 
 # 각 컬럼 설정. 컬럼 이름, 컬럼 넓이, 정렬 등
-treeview.column("#0", width = 100, anchor = "center")
-treeview.heading("#0", text="족보")
+Pedigree_View.column("#0", width = 100, anchor = "center")
+Pedigree_View.heading("#0", text="족보")
 
-treeview.column("#1", width = 100, anchor = "center")
-treeview.heading("one", text="값", anchor = "center")
+Pedigree_View.column("#1", width = 100, anchor = "center")
+Pedigree_View.heading("one", text="값", anchor = "center")
 
 # 표에 데이터 삽입
 for key, value in Player1.pedigree.pedigree.items():
-    treeview.insert('','end',text = key, values = value,iid=key)
+    Pedigree_View.insert('','end',text = key, values = value,iid=key)
+
+# 표 생성하기.
+lbl = tkinter.Label(Player2_frame, text="Player2")
+lbl.pack(side="top", fill ="x")
+
+# 표 생성하기. coulms는 컬럼 이름, displaycolums는 실행될 때 보여지는 순서이다.
+Pedigree_View = tkinter.ttk.Treeview(Player2_frame, columns=["one"], displaycolumns = ["one"])
+Pedigree_View.pack(side="left", fill="both", expand=True)
+
+# 각 컬럼 설정. 컬럼 이름, 컬럼 넓이, 정렬 등
+Pedigree_View.column("#0", width = 100, anchor = "center")
+Pedigree_View.heading("#0", text="족보")
+
+Pedigree_View.column("#1", width = 100, anchor = "center")
+Pedigree_View.heading("one", text="값", anchor = "center")
+
+# 표에 데이터 삽입
+for key, value in Player1.pedigree.pedigree.items():
+    Pedigree_View.insert('','end',text = key, values = value,iid=key)
+
+##### 주사위 값 표 생성 ####
+lbl2 = tkinter.Label(DiceValue_frame, text="Dice_Value")
+lbl2.pack(side="top", fill ="x")
+
+Dice_View = tkinter.ttk.Treeview(DiceValue_frame, columns=["one"], displaycolumns = ["one"])
+Dice_View.pack()
 
 # GUI 실행
 root.mainloop()
@@ -146,6 +194,6 @@ Player 만들기
 주사위 만들기
 주사위 던지기 기능
 주사위 홀딩 기능
-
+족보 만들기 (Dictionary)
 
 '''
