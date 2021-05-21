@@ -80,18 +80,6 @@ class pedigree:
                     'YACHT' : 0}
 
 
-# 초기값  설정
-nScore = 0
-nChance = 3
-#dHandRankings = {'1':2,'2':0,'3':0,'4':0,'5':0,'6':0,'all':0}
-nTurn = 0
-
-# Player1 생성
-Player1 = Player(nScore, nChance, nTurn)
-#Player2 = Player(nScore, nChance, dHandRankings, nTurn)
-
-# 초기값 출력
-Player1.PrintDiceValue()
 
 # 주사위를 굴린다.
 # Player1.tumble_Dice()
@@ -105,75 +93,113 @@ Player1.PrintDiceValue()
 
 ##### 족보 표생성 #####
 # GUI창을 생성하고 라벨을 설정한다.
-root = tk.Tk()
-root.title("Yatch Dice")
-root.geometry("900x600")
-root.resizable(False,False)
+class Game:
+    def __init__(self):
+        self.Setting_Palyer()
+        self.Game_GUI()
+        self.Player1turn = True
 
-Player1_frame = tk.Frame(root, background="#FFF0C1", bd=1, relief="sunken")
-Player2_frame = tk.Frame(root, background="#D2E2FB", bd=1, relief="sunken")
-DiceValue_frame = tk.Frame(root, background="#CCE4CA", bd=1, relief="sunken")
-button_frame = tk.Frame(root, background="#F5C2C1", bd=1, relief="sunken")
+        # GUI 실행
+        self.root.mainloop()
 
-Player1_frame.grid(row=0, column=0, sticky="nsew", padx=2, pady=2)
-Player2_frame.grid(row=1, column=0, sticky="nsew", padx=2, pady=2)
-DiceValue_frame.grid(row=0, column=1, rowspan=2, sticky="nsew", padx=2, pady=2)
-button_frame.grid(row=0, column=2, rowspan=2, sticky="nsew", padx=2, pady=2)
+    def Game_GUI(self):
+        self.root = tk.Tk()
+        self.root.title("Yatch Dice")
+        self.root.geometry("900x600")
+        self.root.resizable(False, False)
 
-root.grid_rowconfigure(0, weight=2)
-root.grid_rowconfigure(1, weight=10)
+        Player1_frame = tk.Frame(self.root, background="#FFF0C1", bd=1, relief="sunken")
+        Player2_frame = tk.Frame(self.root, background="#D2E2FB", bd=1, relief="sunken")
+        DiceValue_frame = tk.Frame(self.root, background="#CCE4CA", bd=1, relief="sunken")
+        button_frame = tk.Frame(self.root, background="#F5C2C1", bd=1, relief="sunken")
 
-root.grid_columnconfigure(0, weight=2)
-root.grid_columnconfigure(1, weight=2)
-root.grid_columnconfigure(2, weight=2)
+        Player1_frame.grid(row=0, column=0, sticky="nsew", padx=2, pady=2)
+        Player2_frame.grid(row=1, column=0, sticky="nsew", padx=2, pady=2)
+        DiceValue_frame.grid(row=0, column=1, rowspan=2, sticky="nsew", padx=2, pady=2)
+        button_frame.grid(row=0, column=2, rowspan=2, sticky="nsew", padx=2, pady=2)
+
+        self.root.grid_rowconfigure(0, weight=2)
+        self.root.grid_rowconfigure(1, weight=10)
+
+        self.root.grid_columnconfigure(0, weight=2)
+        self.root.grid_columnconfigure(1, weight=2)
+        self.root.grid_columnconfigure(2, weight=4)
+
+        lbl = tkinter.Label(Player1_frame, text="Player1")
+        lbl.pack(side="top", fill="x")
+
+        # 표 생성하기. coulms는 컬럼 이름, displaycolums는 실행될 때 보여지는 순서이다.
+        Pedigree_View = tkinter.ttk.Treeview(Player1_frame, columns=["one"], displaycolumns=["one"])
+        Pedigree_View.pack(side="left", fill="both", expand=True)
+
+        # 각 컬럼 설정. 컬럼 이름, 컬럼 넓이, 정렬 등
+        Pedigree_View.column("#0", width=100, anchor="center")
+        Pedigree_View.heading("#0", text="족보")
+
+        Pedigree_View.column("#1", width=100, anchor="center")
+        Pedigree_View.heading("one", text="값", anchor="center")
+
+        # 표에 데이터 삽입
+        for key, value in self.Player1.pedigree.pedigree.items():
+            Pedigree_View.insert('', 'end', text=key, values=value, iid=key)
+
+        # 표 생성하기.
+        lbl = tkinter.Label(Player2_frame, text="Player2")
+        lbl.pack(side="top", fill="x")
+
+        # 표 생성하기. coulms는 컬럼 이름, displaycolums는 실행될 때 보여지는 순서이다.
+        Pedigree_View = tkinter.ttk.Treeview(Player2_frame, columns=["one"], displaycolumns=["one"])
+        Pedigree_View.pack(side="left", fill="both", expand=True)
+
+        # 각 컬럼 설정. 컬럼 이름, 컬럼 넓이, 정렬 등
+        Pedigree_View.column("#0", width=100, anchor="center")
+        Pedigree_View.heading("#0", text="족보")
+
+        Pedigree_View.column("#1", width=100, anchor="center")
+        Pedigree_View.heading("one", text="값", anchor="center")
+
+        # 표에 데이터 삽입
+        for key, value in self.Player1.pedigree.pedigree.items():
+            Pedigree_View.insert('', 'end', text=key, values=value, iid=key)
+
+        ##### 주사위 값 표 생성 ####
+        lbl2 = tkinter.Label(DiceValue_frame, text="Dice_Value")
+        lbl2.pack(side="top", fill="x")
+
+        Dice_View = tkinter.ttk.Treeview(DiceValue_frame, columns=["one"], displaycolumns=["one"])
+        Dice_View.pack()
+
+        button = tkinter.Button(button_frame, overrelief="solid", width=15, command=None, repeatdelay=1000,
+                                repeatinterval=100,
+                                text="주사위 굴리기")
+        button.pack()
+
+    # Player 세팅
+    def Setting_Palyer(self):
+        nScore = 0
+        nChance = 3
+        nTurn = 0
+
+        self.Player1 = Player(nScore,nChance = 3,nTurn = 0)
+        self.Player2 = Player(nScore,nChance = 3,nTurn = 0)
 
 
-lbl = tkinter.Label(Player1_frame, text="Player1")
-lbl.pack(side="top", fill ="x")
+    # 주사위 굴리기 버튼 클릭 시 실행되는 함수
+    def TumbleDice(self):
+        if self.Player1turn == True:
+            self.Player1.tumble_Dice()
+            # 초기값 출력
+            self.Player1.PrintDiceValue()
+        else:
+            self.Player2.tumble_Dice()
+            # 초기값 출력
+            self.Player2.PrintDiceValue()
 
-# 표 생성하기. coulms는 컬럼 이름, displaycolums는 실행될 때 보여지는 순서이다.
-Pedigree_View = tkinter.ttk.Treeview(Player1_frame, columns=["one"], displaycolumns = ["one"])
-Pedigree_View.pack(side="left", fill="both", expand=True)
 
-# 각 컬럼 설정. 컬럼 이름, 컬럼 넓이, 정렬 등
-Pedigree_View.column("#0", width = 100, anchor = "center")
-Pedigree_View.heading("#0", text="족보")
+if __name__ == '__main__':
+    Game()
 
-Pedigree_View.column("#1", width = 100, anchor = "center")
-Pedigree_View.heading("one", text="값", anchor = "center")
 
-# 표에 데이터 삽입
-for key, value in Player1.pedigree.pedigree.items():
-    Pedigree_View.insert('','end',text = key, values = value,iid=key)
-
-# 표 생성하기.
-lbl = tkinter.Label(Player2_frame, text="Player2")
-lbl.pack(side="top", fill ="x")
-
-# 표 생성하기. coulms는 컬럼 이름, displaycolums는 실행될 때 보여지는 순서이다.
-Pedigree_View = tkinter.ttk.Treeview(Player2_frame, columns=["one"], displaycolumns = ["one"])
-Pedigree_View.pack(side="left", fill="both", expand=True)
-
-# 각 컬럼 설정. 컬럼 이름, 컬럼 넓이, 정렬 등
-Pedigree_View.column("#0", width = 100, anchor = "center")
-Pedigree_View.heading("#0", text="족보")
-
-Pedigree_View.column("#1", width = 100, anchor = "center")
-Pedigree_View.heading("one", text="값", anchor = "center")
-
-# 표에 데이터 삽입
-for key, value in Player1.pedigree.pedigree.items():
-    Pedigree_View.insert('','end',text = key, values = value,iid=key)
-
-##### 주사위 값 표 생성 ####
-lbl2 = tkinter.Label(DiceValue_frame, text="Dice_Value")
-lbl2.pack(side="top", fill ="x")
-
-Dice_View = tkinter.ttk.Treeview(DiceValue_frame, columns=["one"], displaycolumns = ["one"])
-Dice_View.pack()
-
-# GUI 실행
-root.mainloop()
 
 
 # tkinter를 이용한 gui 출력
