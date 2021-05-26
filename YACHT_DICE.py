@@ -22,6 +22,14 @@ class Player:
         self.Dice4 = Dice()
         self.Dice5 = Dice()
         self.Dices = [self.Dice1,self.Dice2,self.Dice3,self.Dice4,self.Dice5]
+        self.dDices = {'Dice1' : self.Dice1.nValue, 'Dice2' : self.Dice2.nValue, 'Dice3' : self.Dice3.nValue,
+                          'Dice4' : self.Dice4.nValue, 'Dice5' : self.Dice5.nValue}
+
+    # 주사위 값 업데이트
+    def Update_Dice(self):
+        self.Dices = [self.Dice1, self.Dice2, self.Dice3, self.Dice4, self.Dice5]
+        self.dDices = {'Dice1': self.Dice1.nValue, 'Dice2': self.Dice2.nValue, 'Dice3': self.Dice3.nValue,
+                       'Dice4': self.Dice4.nValue, 'Dice5': self.Dice5.nValue}
 
     # 주사위 값 출력
     def PrintDiceValue(self):
@@ -29,11 +37,12 @@ class Player:
 
     # 주사위 굴리기
     def tumble_Dice(self):
-        print("주사위를 돌리셨습니다.")
         for Dice in self.Dices:
             if not Dice.bHolding:
                 Dice.tumble()
         self.nCounts = self.nCounts + 1
+        print("주사위를 돌리셨습니다.")
+        self.Update_Dice()
 
     # 주사위 값 홀딩 시키기
     # 오버로딩 안되서 입력값 유무를 판단하여 Holding
@@ -61,7 +70,7 @@ class Player:
 
 # 주사위 만들기
 class Dice:
-    def __init__(self,nValue=1,bHolding=False):
+    def __init__(self,nValue=0,bHolding=False):
         self.nValue = nValue
         self.bHolding = bHolding
 
@@ -162,14 +171,23 @@ class Game:
         for key, value in self.Player1.pedigree.pedigree.items():
             Pedigree_View.insert('', 'end', text=key, values=value, iid=key)
 
-        ##### 주사위 값 표 생성 ####
+        ##### 주사위 값 표 생성 #####
         lbl2 = tkinter.Label(DiceValue_frame, text="Dice_Value")
         lbl2.pack(side="top", fill="x")
 
-        Dice_View = tkinter.ttk.Treeview(DiceValue_frame, columns=["one"], displaycolumns=["one"])
-        Dice_View.pack()
+        self.Dice_View = tkinter.ttk.Treeview(DiceValue_frame, columns=["one"], displaycolumns=["one"])
+        self.Dice_View.pack(side="left", fill="both", expand=True)
 
-        button = tkinter.Button(button_frame, overrelief="solid", width=15, command=None, repeatdelay=1000,
+        self.Dice_View.column("#0", width=100, anchor="center")
+        self.Dice_View.heading("#0", text="주사위")
+
+        self.Dice_View.column("#1", width=100, anchor="center")
+        self.Dice_View.heading("one", text="값", anchor="center")
+        for key, value in self.Player1.dDices.items():
+            self.Dice_View.insert('', 'end', text=key, values=value, iid=key)
+
+        # 주사위 굴리기 버튼 추가.
+        button = tkinter.Button(button_frame, overrelief="solid", width=15, command=self.TumbleDice, repeatdelay=1000,
                                 repeatinterval=100,
                                 text="주사위 굴리기")
         button.pack()
@@ -188,12 +206,21 @@ class Game:
     def TumbleDice(self):
         if self.Player1turn == True:
             self.Player1.tumble_Dice()
-            # 초기값 출력
-            self.Player1.PrintDiceValue()
+            self.UpdateDiceValue()
         else:
             self.Player2.tumble_Dice()
-            # 초기값 출력
-            self.Player2.PrintDiceValue()
+            self.UpdateDiceValue()
+
+    # 표에 데이터 삽입
+    def UpdateDiceValue(self):
+        if self.Player1turn == True:
+            for key, value in self.Player1.dDices.items():
+                self.Dice_View.set(key, column="#1",value=value)
+                print(value)
+
+        else:
+            for key, value in self.Player2.dDices.items():
+                self.Dice_View.set(key, column="#1",value=value)
 
 
 if __name__ == '__main__':
