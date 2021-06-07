@@ -40,9 +40,10 @@ class Player:
         for Dice in self.Dices:
             if not Dice.bHolding:
                 Dice.tumble()
-        self.nCounts = self.nCounts + 1
+        self.nCounts = self.nCounts - 1
         print("주사위를 돌리셨습니다.")
         self.Update_Dice()
+        self.nTurn += 1
 
     # 주사위 값 홀딩 시키기
     # 오버로딩 안되서 입력값 유무를 판단하여 Holding
@@ -103,10 +104,11 @@ class pedigree:
 ##### 족보 표생성 #####
 # GUI창을 생성하고 라벨을 설정한다.
 class Game:
+    Player1turn = True
+
     def __init__(self):
         self.Setting_Palyer()
         self.Game_GUI()
-        self.Player1turn = True
 
         # GUI 실행
         self.root.mainloop()
@@ -119,12 +121,12 @@ class Game:
 
         Player1_frame = tk.Frame(self.root, background="#FFF0C1", bd=1, relief="sunken")
         Player2_frame = tk.Frame(self.root, background="#D2E2FB", bd=1, relief="sunken")
-        DiceValue_frame = tk.Frame(self.root, background="#CCE4CA", bd=1, relief="sunken")
+        self.DiceValue_frame = tk.Frame(self.root, background="#CCE4CA", bd=1, relief="sunken")
         button_frame = tk.Frame(self.root, background="#F5C2C1", bd=1, relief="sunken")
 
         Player1_frame.grid(row=0, column=0, sticky="nsew", padx=2, pady=2)
         Player2_frame.grid(row=1, column=0, sticky="nsew", padx=2, pady=2)
-        DiceValue_frame.grid(row=0, column=1, rowspan=2, sticky="nsew", padx=2, pady=2)
+        self.DiceValue_frame.grid(row=0, column=1, rowspan=2, sticky="nsew", padx=2, pady=2)
         button_frame.grid(row=0, column=2, rowspan=2, sticky="nsew", padx=2, pady=2)
 
         self.root.grid_rowconfigure(0, weight=2)
@@ -172,10 +174,10 @@ class Game:
             Pedigree_View.insert('', 'end', text=key, values=value, iid=key)
 
         ##### 주사위 값 표 생성 #####
-        lbl2 = tkinter.Label(DiceValue_frame, text="Dice_Value")
+        lbl2 = tkinter.Label(self.DiceValue_frame, text="Dice_Value")
         lbl2.pack(side="top", fill="x")
 
-        self.Dice_View = tkinter.ttk.Treeview(DiceValue_frame, columns=["one"], displaycolumns=["one"])
+        self.Dice_View = tkinter.ttk.Treeview(self.DiceValue_frame, columns=["one"], displaycolumns=["one"])
         self.Dice_View.pack(side="left", fill="both", expand=True)
 
         self.Dice_View.column("#0", width=100, anchor="center")
@@ -186,8 +188,13 @@ class Game:
         for key, value in self.Player1.dDices.items():
             self.Dice_View.insert('', 'end', text=key, values=value, iid=key)
 
+        # Player Turn View 추가
+        turn = "Player1"
+        self.TurnLabel = tkinter.Label(self.DiceValue_frame, text = turn, width =10, height =5, fg="red", relief="solid")
+        self.TurnLabel.pack(side = "bottom")
+
         # 주사위 굴리기 버튼 추가.
-        button = tkinter.Button(button_frame, overrelief="solid", width=15, command=self.TumbleDice, repeatdelay=1000,
+        button = tkinter.Button(button_frame, overrelief="solid", width=15, command=self.Tumble_Click, repeatdelay=1000,
                                 repeatinterval=100,
                                 text="주사위 굴리기")
         button.pack()
@@ -203,13 +210,15 @@ class Game:
 
 
     # 주사위 굴리기 버튼 클릭 시 실행되는 함수
-    def TumbleDice(self):
+    def Tumble_Click(self):
         if self.Player1turn == True:
             self.Player1.tumble_Dice()
             self.UpdateDiceValue()
+            self.UpdateTurn()
         else:
             self.Player2.tumble_Dice()
             self.UpdateDiceValue()
+            self.UpdateTurn()
 
     # 표에 데이터 삽입
     def UpdateDiceValue(self):
@@ -221,7 +230,26 @@ class Game:
         else:
             for key, value in self.Player2.dDices.items():
                 self.Dice_View.set(key, column="#1",value=value)
+                print(value)
 
+    # 표에 플레이어턴 삽입 및 버튼 클릭시 업데이트
+    def UpdateTurn(self):
+        if(self.Player1turn):
+            if(self.Player1.nTurn == 3):
+                self.Player1turn = False
+                self.Player1.nTurn = 0
+        else:
+            if(self.Player2.nTurn == 3):
+                self.Player1turn = True
+                self.Player2.nTurn = 0
+
+        bturn = self.Player1turn
+        if bturn == True:
+            turn = "Player1"
+        else:
+            turn = "Player2"
+        self.TurnLabel['text'] = turn
+        print(self.Player1.nTurn)
 
 if __name__ == '__main__':
     Game()
@@ -234,7 +262,8 @@ if __name__ == '__main__':
 
 ### 진행중 ###
 # YACHT_DICE 게임 만들기
-# 족보 패 표로 출력하기
+# Player Chance View 추가 및 Tumble 시 Chance -되는 것 구현
+# 홀딩 기능 추가
 
 ### 예정 ###
 # Player1 AI 만들기
@@ -248,5 +277,5 @@ Player 만들기
 주사위 던지기 기능
 주사위 홀딩 기능
 족보 만들기 (Dictionary)
-
+족보 패 표로 출력하기
 '''
